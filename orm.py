@@ -66,7 +66,6 @@ class ForeignKey:
 class ModelMeta(type):
 
     def __new__(cls, name, bases, attrs):
-        attrs['_class_name'] = name #TODO need this?
         name = camel_to_underscores(name)
         attrs['_table_name'] = name
         fields = {}
