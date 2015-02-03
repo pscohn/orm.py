@@ -11,21 +11,7 @@ ORDER = 'ORDER BY {field} {direction}'
 LIMIT = 'LIMIT %s'
 OFFSET = 'OFFSET %s'
 
-queries = {
-'save': 'INSERT INTO "{table}" ({field}[,...]) VALUES ({value[,...]})',
-'get': 'SELECT {fields} from "{table}" WHERE id=%s',
-'+filter': 'WHERE {param}={value}',
-}
-
 ## UTILS ##
-
-def print_dict(d):
-    for k, v in d.items():
-        print('%s: %s' % (k, v))
-
-def quote(st):
-    if type(st) == str:
-        return "'" + st + "'"
 
 def comma_separated(fields):
     return ', '.join(fields)
@@ -122,7 +108,6 @@ class Model(metaclass=ModelMeta):
         fields, values, fk, fv = self._populate_lists()
         fields += fk
         values += fv
-#        values = list(map(quote, values))
         fields = comma_separated(fields)
         sql = INSERT.format(table=self._table_name, fields=fields, values=', '.join(['%s' for _ in values]))
         c = Connection()
