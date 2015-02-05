@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import orm
 
 class User(orm.Model):
@@ -11,6 +10,4 @@ class Message(orm.Model):
     user_to = orm.ForeignKey(User) # field should be named "user_to_id"
     date_sent = orm.Field()
     body = orm.Field()
-    read = orm.Field(default=False)        
-
-
+    read = orm.Field(default=False)
