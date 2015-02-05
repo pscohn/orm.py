@@ -98,6 +98,7 @@ Pass in the ID or kwargs matching your model fields.
 
 - separator: pass in 'OR' and a kwarg with a list of possible arguments. For example:
 
+
     Message.all(separator='OR', user_from=[user_1, user_2])
 
 This will match all messages from either user\_1 or user\_2.
@@ -108,8 +109,8 @@ This will match all messages from either user\_1 or user\_2.
 
 - offset: Integer to offset your search result
 
-
 - kwargs: each kwarg value can be a single object or a list.
+
 
     Model.count(**kwargs)
 
