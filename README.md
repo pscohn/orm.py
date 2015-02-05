@@ -30,6 +30,7 @@ To do
 
 - python2 support
 - better comparison support
+- only update fields that have changed
 - order by with `get`
 - query unique entries
 - tests
