@@ -64,7 +64,6 @@ class ForeignKey:
 
 
 class ModelMeta(type):
-
     def __new__(cls, name, bases, attrs):
         name = camel_to_underscores(name)
         attrs['_table_name'] = name
@@ -88,6 +87,19 @@ class Model(metaclass=ModelMeta):
             setattr(self, k, v.value)        
         for k, v in self._foreign_keys.items():
             setattr(self, k, v.value)
+
+    def save(self):
+        if self.id is None:
+            self._save()
+        else:
+            self._update()
+
+    def delete(self):
+        sql = DELETE.format(table=self.__class__._table_name)
+        data = (self.id,)
+        c = Connection()
+        c.execute(sql, data)
+        c.close()
 
     def _populate_lists(self):
         fields = []
@@ -120,23 +132,8 @@ class Model(metaclass=ModelMeta):
         values += fv
         values.append(self.id)
         sql = UPDATE.format(table=self._table_name, fields=', '.join([f+'=%s' for f in fields]))
-#        print(type(sql), type(values))
-#        print(sql, values)
         c = Connection()
         c.execute(sql, values)
-        c.close()
-
-    def save(self):
-        if self.id is None:
-            self._save()
-        else:
-            self._update()
-
-    def delete(self):
-        sql = DELETE.format(table=self.__class__._table_name)
-        data = (self.id,)
-        c = Connection()
-        c.execute(sql, data)
         c.close()
 
     @classmethod
@@ -231,7 +228,6 @@ class Model(metaclass=ModelMeta):
         c.close()
         return
 
-
     @classmethod
     def is_unique(cls, **kwargs):
         o = list(cls.all(**kwargs))
@@ -248,14 +244,10 @@ class Model(metaclass=ModelMeta):
         return count
 
     @classmethod
-    def _get_fields(cls):
-        return list(cls._fields.keys()) + list(map(lambda x: x+'_id', cls._foreign_keys.keys()))
-        
- 
-    @classmethod
     def objectify(cls, cur, fields):
         if cur is None:
             return None
+
         o = cls()
         for i, f in enumerate(cur):
             cleaned_field = fields[i][:-3] if fields[i].endswith('_id') else fields[i]
@@ -268,3 +260,7 @@ class Model(metaclass=ModelMeta):
             elif fields[i] == 'id':
                 setattr(o, 'id', f)
         return o
+
+    @classmethod
+    def _get_fields(cls):
+        return list(cls._fields.keys()) + list(map(lambda x: x+'_id', cls._foreign_keys.keys()))
