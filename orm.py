@@ -29,6 +29,19 @@ def camel_to_underscores(name):
     result = result.strip('_')
     return result
 
+def format_args(sql, values, order_by, limit, offset):
+    if order_by is not None:
+        order = 'DESC' if order_by.startswith('-') else 'ASC'
+        ordersql = ORDER.format(field=order_by.strip('-'), direction=order)
+        sql += ' ' + ordersql
+    if limit != 'ALL' and limit is not None:
+        sql += ' ' + LIMIT
+        values.append(limit)
+    if offset is not None:
+        sql += ' ' + OFFSET
+        values.append(offset)
+    return sql, values
+
 ## ---- connection class ----##
 
 class Connection:
@@ -170,18 +183,24 @@ class Model(metaclass=ModelMeta):
                 c.close()
                 return o
 
+
+
     @classmethod
     def all(cls, separator='AND', order_by=None, limit='ALL', offset=None, count=False, **kwargs):
         fields = ['id'] + cls._get_fields()
 
         if len(kwargs) == 0:
-            sql = ALL.format(fields=comma_separated(fields), table=cls._table_name)
-            data = ()
+            sql = ALL
+            values = []
+
+            sql, values = format_args(sql, values, order_by, limit, offset)
+            sql = sql.format(fields=comma_separated(fields), table=cls._table_name)
+            data = tuple(values)
 
         else:
             sql = ALL
-            i = 0
             values = []
+            i = 0
             for key, val in kwargs.items():
                 begin = ' WHERE ' if i==0 else ' %s ' % separator
                 if type(val) == list:
@@ -201,19 +220,9 @@ class Model(metaclass=ModelMeta):
                         sql += begin + '{key}=%s'.format(key=key)
                 i += 1
 
-            if order_by is not None:
-                order = 'DESC' if order_by.startswith('-') else 'ASC'
-                ordersql = ORDER.format(field=order_by.strip('-'), direction=order)
-                sql += ' ' + ordersql
-            if limit != 'ALL' and limit is not None:
-                sql += ' ' + LIMIT
-                values.append(limit)
-            if offset is not None:
-                sql += ' ' + OFFSET
-                values.append(offset)
-
-            sql = sql.format(fields=comma_separated(fields), table=cls._table_name)
+            sql, values = format_args(sql, values, order_by, limit, offset)
             data = tuple(values)
+            sql = sql.format(fields=comma_separated(fields), table=cls._table_name)
 
         c = Connection()
         c.execute(sql, data)
