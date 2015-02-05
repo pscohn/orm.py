@@ -1,3 +1,0 @@
-config = {
-    'dbname': 'ormtest',
-}
