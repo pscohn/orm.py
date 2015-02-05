@@ -1,5 +1,6 @@
 import re
 import psycopg2
+from orm_config import config
 
 DELETE = 'DELETE FROM "{table}" WHERE id=%s'
 INSERT = 'INSERT INTO "{table}" ({fields}) VALUES ({values}) RETURNING id'
@@ -37,7 +38,7 @@ class Connection:
         self.connect()
         
     def connect(self):
-        self.conn = psycopg2.connect(dbname='rsstest')
+        self.conn = psycopg2.connect(dbname=config['dbname'])
         self.cur = self.conn.cursor()
 
     def execute(self, query, data):
