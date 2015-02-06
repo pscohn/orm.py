@@ -51,7 +51,7 @@ class Connection:
         self.connect()
         
     def connect(self):
-        self.conn = psycopg2.connect(dbname=config['dbname'])
+        self.conn = psycopg2.connect(dbname=config['dbname'], user=config['user'], host=config['host'], password=config['password'])
         self.cur = self.conn.cursor()
 
     def execute(self, query, data):
