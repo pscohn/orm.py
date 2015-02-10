@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='orm.py',
-    version='0.1',
+    version='0.1.1',
     description='A minimal ORM for postgres',
     long_description=open('README.md').read(),
     url='https://github.com/pscohn/orm.py',
@@ -13,6 +13,7 @@ setup(
     license='MIT',
     keywords='orm object relational mapper postgres postgresql',
     install_requires=['psycopg2'],
+    py_modules=['orm'],
     
     classifiers=[
     'Development Status :: 3 - Alpha',
