@@ -159,7 +159,8 @@ class Model(metaclass=ModelMeta):
             c = Connection()
             c.execute(sql, data)
             o = cls.objectify(c.cur.fetchone(), fields)
-            o.id = id
+            if o is not None:
+                o.id = id
             c.close()
             return o
 
@@ -208,9 +209,11 @@ class Model(metaclass=ModelMeta):
                         if key in cls._foreign_keys:
                             values.append(v.id)
                             sql += begin + '{key}=%s'.format(key=key+'_id')
+                            begin = ' %s ' % separator
                         elif key in cls._fields:
                             values.append(v)
                             sql += begin + '{key}=%s'.format(key=key)
+                            begin = ' %s ' % separator
                 else:
                     if key in cls._foreign_keys:
                         values.append(val.id)
